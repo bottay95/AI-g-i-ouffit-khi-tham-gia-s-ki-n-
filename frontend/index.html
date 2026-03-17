@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Outfit Recommender - Gợi Ý Trang Phục Thông Minh</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-content">
+        <a href="#" class="logo">
+          <i class="fas fa-tshirt"></i>
+          <span>AI Outfit</span>
+        </a>
+        <div class="header-actions" style="display: flex; gap: 15px; align-items: center;">
+          <button id="theme-toggle" class="btn-theme" title="Chuyển chế độ Giao Diện"
+            style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0 16px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s; font-weight: 500; font-size: 14px;">
+            <i class="fas fa-moon"></i>
+            <span id="theme-text">Chế độ tối</span>
+          </button>
+          <button id="auth-btn" class="btn-theme" title="Tài khoản"
+            style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0 16px; height: 40px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s; font-weight: 500; font-size: 14px;">
+            <i class="fas fa-user"></i>
+            <span id="auth-text">Đăng nhập</span>
+          </button>
+          <button id="favorites-btn" class="btn-favorites">
+            <i class="fas fa-heart"></i>
+            <span id="fav-count">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="container">
+      <!-- Hero Section - Simple -->
+      <section class="hero-simple">
+        <h1>
+          <i class="fas fa-magic"></i>
+          <span class="title-ai">AI</span>
+          <span class="title-main">Gợi Ý Outfit</span>
+          <span class="title-highlight">Thông Minh</span>
+        </h1>
+        <p>✨ Để AI giúp bạn tìm trang phục phù hợp nhất ✨</p>
+        <!-- AI Learning Status -->
+        <div id="ai-learning-status" class="ai-learning-status level-0">
+          <span class="learning-icon">🤖</span>
+          <span class="learning-text">AI chưa học</span>
+          <span class="learning-count">(0 tương tác)</span>
+          <button id="reset-ai-btn" class="btn-reset-ai" title="Reset AI về ban đầu">🔄</button>
+        </div>
+      </section>
+
+      <!-- Form Section -->
+      <section class="form-section">
+        <div class="form-card">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="gender">
+                <i class="fas fa-venus-mars"></i> Giới tính
+              </label>
+              <select id="gender">
+                <option value="">-- Chọn --</option>
+                <option value="nữ">Nữ</option>
+                <option value="nam">Nam</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="event">
+                <i class="fas fa-calendar-alt"></i> Sự kiện
+              </label>
+              <select id="event">
+                <option value="">-- Chọn --</option>
+                <option value="đi chơi">Đi chơi / Dạo phố</option>
+                <option value="đi làm">Đi làm / Công sở</option>
+                <option value="đi tiệc">Tiệc cưới</option>
+                <option value="đi học">Đi học</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="formality">
+                <i class="fas fa-user-tie"></i> Phong cách
+              </label>
+              <select id="formality">
+                <option value="any">Tất cả</option>
+                <option value="formal">Trang trọng</option>
+                <option value="informal">Casual</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="weather">
+                <i class="fas fa-cloud-sun"></i> Thời tiết
+              </label>
+              <select id="weather">
+                <option value="">-- Tất cả thời tiết --</option>
+                <option value="sunny">☀️ Nắng nóng (>30°C)</option>
+                <option value="warm">🌤️ Ấm áp (25-30°C)</option>
+                <option value="cool">🌥️ Mát mẻ (18-25°C)</option>
+                <option value="cold">❄️ Lạnh (<18°C)< /option>
+                <option value="rainy">🌧️ Mưa</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button id="search-btn" class="btn-primary">
+              <i class="fas fa-sparkles"></i> Gợi Ý Outfit
+            </button>
+            <button id="demo-btn" class="btn-secondary">
+              <i class="fas fa-eye"></i> Xem Mẫu
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="ai-processing" class="loading hidden">
+          <div class="spinner"></div>
+          <span>AI đang lựa chọn outfit phù hợp</span>
+        </div>
+      </section>
+
+      <!-- Results Section -->
+      <section class="results-section">
+        <div class="results-header">
+          <h2 id="results-title">
+            <i class="fas fa-fire-alt"></i> Gợi Ý Cho Bạn
+          </h2>
+          <p id="results-info" class="results-info"></p>
+          <div id="ai-stats" class="ai-stats hidden">
+            <span><i class="fas fa-percentage"></i> Điểm phù hợp: <strong id="match-score">0%</strong></span>
+            <span><i class="fas fa-tshirt"></i> <strong id="analysis-count">0</strong> outfit</span>
+          </div>
+        </div>
+
+        <div id="filter-tags" class="filter-tags"></div>
+
+        <div id="results" class="results-grid">
+          <div class="empty-state">
+            <i class="fas fa-wand-magic-sparkles"></i>
+            <h3>Chọn tiêu chí và nhấn "Gợi Ý Outfit"</h3>
+            <p>AI sẽ tìm những trang phục phù hợp nhất cho bạn</p>
+          </div>
+        </div>
+
+        <div class="load-more-wrapper hidden" id="load-more-wrapper">
+          <button class="btn-load-more" id="load-more-btn">
+            <i class="fas fa-sync-alt"></i> Gợi Ý Tiếp
+          </button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Detail Modal -->
+  <div id="detail-modal" class="modal hidden">
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal-content">
+      <button id="modal-close" class="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-body">
+        <div class="modal-image">
+          <img id="modal-img" src="" alt="">
+        </div>
+        <div class="modal-info">
+          <span class="modal-badge">AI Recommended</span>
+          <h2 id="modal-name"></h2>
+          <p class="modal-category" id="modal-category"></p>
+          <p class="modal-desc" id="modal-desc"></p>
+
+          <div class="modal-details">
+            <div class="detail-item">
+              <i class="fas fa-palette"></i>
+              <span id="modal-color"></span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-gem"></i>
+              <span id="modal-style"></span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-leaf"></i>
+              <span id="modal-material"></span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-calendar-check"></i>
+              <span id="modal-events"></span>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button id="modal-fav-btn" class="btn-fav">
+              <i class="far fa-heart"></i> Yêu thích
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites Panel -->
+  <div id="favorites-panel" class="modal hidden">
+    <div class="modal-overlay" id="fav-overlay"></div>
+    <div class="modal-content modal-wide">
+      <button id="fav-close" class="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="favorites-header">
+        <h2><i class="fas fa-heart"></i> Yêu Thích</h2>
+        <span>(<span id="fav-total">0</span> sản phẩm)</span>
+      </div>
+      <div id="favorites-list" class="results-grid"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2026 AI Outfit Recommender</p>
+  </footer>
+
+  <!-- Auth Modal -->
+  <div id="auth-modal" class="modal hidden">
+    <div class="modal-overlay" id="auth-overlay"></div>
+    <div class="modal-content" style="max-width: 400px; padding: 30px;">
+      <button id="auth-close" class="modal-close">
+        <i class="fas fa-times"></i>
+      </button>
+
+      <!-- Login Form -->
+      <div id="login-form-container">
+        <h2 style="margin-bottom: 20px; text-align: center;"><i class="fas fa-sign-in-alt"></i> Đăng Nhập</h2>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="login-username"><i class="fas fa-user"></i> Tên đăng nhập</label>
+          <input type="text" id="login-username" class="form-control" placeholder="Nhập tên đăng nhập..."
+            style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="login-password"><i class="fas fa-lock"></i> Mật khẩu</label>
+          <input type="password" id="login-password" class="form-control" placeholder="Nhập mật khẩu..."
+            style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+        </div>
+        <div id="login-error"
+          style="color: #ef4444; margin-bottom: 15px; font-size: 14px; text-align: center; display: none;"></div>
+        <button id="btn-submit-login" class="btn-primary"
+          style="width: 100%; justify-content: center; margin-bottom: 15px;">Đăng Nhập</button>
+
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+          <div style="height: 1px; flex: 1; background: rgba(0,0,0,0.1);"></div>
+          <span style="font-size: 13px; color: #666; padding: 0 10px;">Hoặc</span>
+          <div style="height: 1px; flex: 1; background: rgba(0,0,0,0.1);"></div>
+        </div>
+
+        <div id="google-login-btn"
+          style="display: flex; justify-content: center; margin-bottom: 15px; min-height: 40px;"></div>
+
+        <p style="text-align: center; font-size: 14px;">Chưa có tài khoản? <a href="#" id="show-register"
+            style="color: var(--primary); font-weight: 600; text-decoration: none;">Đăng ký ngay</a></p>
+      </div>
+
+      <!-- Register Form -->
+      <div id="register-form-container" class="hidden">
+        <h2 style="margin-bottom: 20px; text-align: center;"><i class="fas fa-user-plus"></i> Đăng Ký</h2>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="reg-username"><i class="fas fa-user"></i> Tên đăng nhập</label>
+          <input type="text" id="reg-username" class="form-control" placeholder="Nhập tên đăng nhập..."
+            style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 15px;">
+          <label for="reg-email"><i class="fas fa-envelope"></i> Email</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="Nhập email..."
+            style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+        </div>
+        <div class="form-group" style="margin-bottom: 20px;">
+          <label for="reg-password"><i class="fas fa-lock"></i> Mật khẩu</label>
+          <input type="password" id="reg-password" class="form-control" placeholder="Tạo mật khẩu..."
+            style="width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.5); background: rgba(255, 255, 255, 0.6); margin-top: 5px;">
+        </div>
+        <div id="register-error"
+          style="color: #ef4444; margin-bottom: 15px; font-size: 14px; text-align: center; display: none;"></div>
+        <button id="btn-submit-register" class="btn-primary"
+          style="width: 100%; justify-content: center; margin-bottom: 15px;">Đăng Ký</button>
+        <p style="text-align: center; font-size: 14px;">Đã có tài khoản? <a href="#" id="show-login"
+            style="color: var(--primary); font-weight: 600; text-decoration: none;">Đăng nhập</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div id="logout-modal" class="modal hidden">
+    <div class="modal-overlay" id="logout-overlay"></div>
+    <div class="modal-content" style="max-width: 400px; padding: 30px; text-align: center;">
+      <div style="font-size: 40px; color: var(--primary, #8b5cf6); margin-bottom: 15px;">
+        <i class="fas fa-sign-out-alt"></i>
+      </div>
+      <h2 style="margin-bottom: 15px; font-size: 22px;">Xác nhận đăng xuất</h2>
+      <p style="margin-bottom: 25px; color: #666; font-size: 15px;">Bạn có chắc chắn muốn đăng xuất khỏi ứng dụng?</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="btn-cancel-logout" class="btn-secondary"
+          style="flex: 1; justify-content: center; padding: 12px;">Hủy bỏ</button>
+        <button id="btn-confirm-logout" class="btn-primary"
+          style="flex: 1; justify-content: center; padding: 12px;">Đăng xuất</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="js/outfit_database.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/main.js"></script>
+</body>
+
+</html>

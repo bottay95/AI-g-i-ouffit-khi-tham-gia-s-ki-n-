@@ -1,0 +1,9 @@
+flask
+flask-cors
+gunicorn
+pandas
+numpy
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+requests

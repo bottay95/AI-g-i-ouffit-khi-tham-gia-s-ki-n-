@@ -1,0 +1,138 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "description": "Manifest for outfit recommendation images organized by context and category",
+    "contexts": {
+      "hoc": {
+        "name": "Học tập",
+        "formality": "informal",
+        "description": "Trang phục cho các hoạt động học tập, đi học"
+      },
+      "choi": {
+        "name": "Đi chơi",
+        "formality": "informal",
+        "description": "Trang phục casual cho hoạt động giải trí, hẹn hò"
+      },
+      "lam": {
+        "name": "Làm việc",
+        "formality": "formal",
+        "description": "Trang phục công sở, chuyên nghiệp"
+      },
+      "tiec": {
+        "name": "Tiệc tùng",
+        "formality": "formal",
+        "description": "Trang phục lịch sự cho sự kiện, đám cưới, tiệc"
+      }
+    },
+    "categories": {
+      "tops": {
+        "name": "Áo",
+        "variants": ["sơ mi", "áo khoác", "áo hai dây", "áo len", "áo thun"]
+      },
+      "bottoms": {
+        "name": "Quần/Váy",
+        "variants": ["váy", "quần jean", "quần tây", "quần âu"]
+      },
+      "shoes": {
+        "name": "Giày",
+        "variants": ["giày cao gót", "giày thể thao", "giày tây", "sandal", "boots"]
+      },
+      "accessories": {
+        "name": "Phụ kiện",
+        "variants": ["dây chuyền", "thắt lưng", "túi xách", "kính mắt", "nón"]
+      }
+    }
+  },
+  "images": {
+    "context_hoc": {
+      "context": "hoc",
+      "items": [
+        {
+          "id": "hoc_top_001",
+          "category": "tops",
+          "subcategory": "áo thun",
+          "path": "context_mapping/hoc/top_casual_01.jpg",
+          "style": "casual",
+          "formality": "informal",
+          "suitable_events": "học tập;tập thể dục"
+        }
+      ]
+    },
+    "context_choi": {
+      "context": "choi",
+      "items": [
+        {
+          "id": "choi_bottom_001",
+          "category": "bottoms",
+          "subcategory": "quần jean",
+          "path": "context_mapping/choi/jeans_casual_01.jpg",
+          "style": "relaxed",
+          "formality": "informal",
+          "suitable_events": "đi chơi;tiệc casual;hẹn hò"
+        }
+      ]
+    },
+    "context_lam": {
+      "context": "lam",
+      "items": [
+        {
+          "id": "lam_top_001",
+          "category": "tops",
+          "subcategory": "áo sơ mi",
+          "path": "context_mapping/lam/blouse_formal_01.jpg",
+          "style": "classic",
+          "formality": "formal",
+          "suitable_events": "công sở;buổi họp"
+        }
+      ]
+    },
+    "context_tiec": {
+      "context": "tiec",
+      "items": [
+        {
+          "id": "tiec_shoe_001",
+          "category": "shoes",
+          "subcategory": "giày cao gót",
+          "path": "context_mapping/tiec/heels_formal_01.jpg",
+          "style": "formal",
+          "formality": "formal",
+          "suitable_events": "đám cưới;tiệc;gala"
+        }
+      ]
+    }
+  },
+  "recommendations": {
+    "event_mapping": {
+      "học tập": {
+        "contexts": ["hoc"],
+        "categories": ["tops", "bottoms"],
+        "formality_preference": "informal"
+      },
+      "đi chơi": {
+        "contexts": ["choi"],
+        "categories": ["tops", "bottoms", "shoes"],
+        "formality_preference": "informal"
+      },
+      "công sở": {
+        "contexts": ["lam"],
+        "categories": ["tops", "bottoms", "shoes", "accessories"],
+        "formality_preference": "formal"
+      },
+      "đám cưới": {
+        "contexts": ["tiec"],
+        "categories": ["tops", "bottoms", "shoes", "accessories"],
+        "formality_preference": "formal"
+      },
+      "tiệc": {
+        "contexts": ["tiec", "choi"],
+        "categories": ["tops", "bottoms", "shoes", "accessories"],
+        "formality_preference": "formal"
+      },
+      "hẹn hò": {
+        "contexts": ["choi"],
+        "categories": ["tops", "bottoms", "shoes", "accessories"],
+        "formality_preference": "casual"
+      }
+    }
+  }
+}
