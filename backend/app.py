@@ -34,18 +34,20 @@ DB_PATH = os.path.join(PROJECT_ROOT, 'data', 'users.db')
 
 def init_db():
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE NOT NULL,
-            password TEXT NOT NULL
-        )
-    ''')
-    conn.commit()
-    conn.close()
+    conn = sqlite3.connect(DB_PATH, timeout=15)
+    try:
+        c = conn.cursor()
+        c.execute('''
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                username TEXT UNIQUE NOT NULL,
+                email TEXT UNIQUE NOT NULL,
+                password TEXT NOT NULL
+            )
+        ''')
+        conn.commit()
+    finally:
+        conn.close()
 
 init_db()
 
@@ -62,12 +64,14 @@ def register():
     hashed_password = generate_password_hash(password)
 
     try:
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, hashed_password))
-        conn.commit()
-        conn.close()
-        return jsonify({'status': 'success', 'message': 'Đăng ký thành công!'})
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        try:
+            c = conn.cursor()
+            c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (username, email, hashed_password))
+            conn.commit()
+            return jsonify({'status': 'success', 'message': 'Đăng ký thành công!'})
+        finally:
+            conn.close()
     except sqlite3.IntegrityError:
         return jsonify({'status': 'error', 'message': 'Tên đăng nhập hoặc email đã tồn tại'}), 400
     except Exception as e:
@@ -82,11 +86,13 @@ def login():
     if not username or not password:
         return jsonify({'status': 'error', 'message': 'Vui lòng nhập tên đăng nhập và mật khẩu'}), 400
 
-    conn = sqlite3.connect(DB_PATH)
-    c = conn.cursor()
-    c.execute('SELECT id, username, password FROM users WHERE username = ?', (username,))
-    user = c.fetchone()
-    conn.close()
+    conn = sqlite3.connect(DB_PATH, timeout=15)
+    try:
+        c = conn.cursor()
+        c.execute('SELECT id, username, password FROM users WHERE username = ?', (username,))
+        user = c.fetchone()
+    finally:
+        conn.close()
 
     if user and check_password_hash(user[2], password):
         return jsonify({
@@ -118,33 +124,35 @@ def google_login():
         email = idinfo['email']
         name = idinfo.get('name', email.split('@')[0])
         
-        conn = sqlite3.connect(DB_PATH)
-        c = conn.cursor()
-        
-        # Kiểm tra xem user có trong database chưa
-        c.execute('SELECT id, username FROM users WHERE email = ?', (email,))
-        user = c.fetchone()
-        
-        if not user:
-            # Tạo tài khoản tự động với pass mặc định (hoặc random hash)
-            random_pass = generate_password_hash(os.urandom(24).hex())
-            try:
-                c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (name, email, random_pass))
-                user_id = c.lastrowid
-                user_name = name
-                conn.commit()
-            except sqlite3.IntegrityError:
-                # Nếu username bị trùng, tự thêm mã số
-                unique_name = f"{name}_{str(os.urandom(4).hex())}"
-                c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (unique_name, email, random_pass))
-                user_id = c.lastrowid
-                user_name = unique_name
-                conn.commit()
-        else:
-            user_id = user[0]
-            user_name = user[1]
+        conn = sqlite3.connect(DB_PATH, timeout=15)
+        try:
+            c = conn.cursor()
             
-        conn.close()
+            # Kiểm tra xem user có trong database chưa
+            c.execute('SELECT id, username FROM users WHERE email = ?', (email,))
+            user = c.fetchone()
+            
+            if not user:
+                # Tạo tài khoản tự động với pass mặc định (hoặc random hash)
+                random_pass = generate_password_hash(os.urandom(24).hex())
+                try:
+                    c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (name, email, random_pass))
+                    user_id = c.lastrowid
+                    user_name = name
+                    conn.commit()
+                except sqlite3.IntegrityError:
+                    # Nếu username bị trùng, tự thêm mã số
+                    unique_name = f"{name}_{str(os.urandom(4).hex())}"
+                    c.execute('INSERT INTO users (username, email, password) VALUES (?, ?, ?)', (unique_name, email, random_pass))
+                    user_id = c.lastrowid
+                    user_name = unique_name
+                    conn.commit()
+            else:
+                user_id = user[0]
+                user_name = user[1]
+                
+        finally:
+            conn.close()
 
         return jsonify({
             'status': 'success',
@@ -178,7 +186,7 @@ def get_ai_engine():
     global ai_engine
     if ai_engine is None:
         try:
-            from backend.recommendation.outfit_ai_engine import get_outfit_ai_engine
+            from recommendation.outfit_ai_engine import get_outfit_ai_engine
             data_path = os.path.join(PROJECT_ROOT, 'data/processed/cleaned_data.csv')
             ai_engine = get_outfit_ai_engine(data_path)
         except ImportError as e:
