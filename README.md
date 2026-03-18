@@ -29,24 +29,7 @@ data/images/
 
 ## 🚀 Quick Start
 
-1. Cài đặt môi trường:
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r backend/requirements.txt
-```
-
-2. Chạy backend:
-
-```bash
-python backend/app.py
-```
-
-3. Mở giao diện:
-
-- Mở `frontend/index.html` trong trình duyệt
-- Hoặc chạy static server: `python -m http.server 8000`
+link đồ án 1:https://congtay-ai-goi-y-outffit.hf.space/
 
 ## 📊 Quản Lý Ảnh
 
